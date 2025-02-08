@@ -3,8 +3,10 @@ from operator import truediv
 from phue import Bridge
 import time
 import random
+import pygame
 
-DURATION = 10
+DURATION = 37
+FIGHT_SONG = 'fightsong.wav'
 BRIDGE_IP = '192.168.50.40'
 ROOM_NAME = 'Living room'
 GREEN_HUE = 25500
@@ -42,12 +44,19 @@ for light in room_lights:
         'sat': getattr(light, 'saturation', None)
     }
 
+#Start fight song
+pygame.mixer.init()
+pygame.mixer.music.load(FIGHT_SONG)
+pygame.mixer.music.play()
+
 end_time = time.time() + DURATION
 min_flash_duration = 0.2
 max_flash_duration = 0.8
 min_pause_duration = 0.1
 max_pause_duration = 0.5
 
+
+#Start Flashing lights
 flash_probability = 0.5
 while time.time() < end_time:
     flashing_lights = [light  for light in room_lights if random.random() < flash_probability]
@@ -76,6 +85,9 @@ while time.time() < end_time:
 
     pause_duration = random.uniform(min_pause_duration, max_pause_duration)
     time.sleep(pause_duration)
+
+#Stop song
+pygame.mixer.music.stop()
 
 for light in room_lights:
     state = original_states.get(light.name, {})
