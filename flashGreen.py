@@ -6,6 +6,7 @@ import random
 
 DURATION = 10
 BRIDGE_IP = '192.168.50.40'
+ROOM_NAME = 'Living room'
 GREEN_HUE = 25500
 GREEN_SAT = 254
 MAX_BRI = 254
@@ -17,23 +18,23 @@ light_objects = bridge.get_light_objects('id')
 groups = bridge.get_group()
 
 
-living_room_group_id = None
+room_group_id = None
 for group_id, group_info in groups.items():
-    if group_info['name'] == 'Living room':
-        living_room_group_id = group_id
-        print('LIVING ROOM GROUP ID:', living_room_group_id)
+    if group_info['name'] == ROOM_NAME:
+        room_group_id = group_id
+        print('ROOM GROUP ID:', room_group_id)
         break
 
-if living_room_group_id is None:
-    print('LIVING ROOM GROUP ID NOT FOUND')
+if room_group_id is None:
+    print('ROOM GROUP ID NOT FOUND')
     exit(1)
 
-living_room_light_ids = groups[living_room_group_id]['lights']
-living_room_lights = [light_objects[int(light_id)] for light_id in living_room_light_ids]
+room_light_ids = groups[room_group_id]['lights']
+room_lights = [light_objects[int(light_id)] for light_id in room_light_ids]
 
 #save original states to set back
 original_states = {}
-for light in living_room_lights:
+for light in room_lights:
     original_states[light.name] = {
         'on': light.on,
         'bri': light.brightness,
@@ -49,10 +50,10 @@ max_pause_duration = 0.5
 
 flash_probability = 0.5
 while time.time() < end_time:
-    flashing_lights = [light  for light in living_room_lights if random.random() < flash_probability]
+    flashing_lights = [light  for light in room_lights if random.random() < flash_probability]
 
     if not flashing_lights:
-        flashing_lights.append(random.choice(living_room_lights))
+        flashing_lights.append(random.choice(room_lights))
 
     for light in flashing_lights:
         light.on = True
@@ -76,7 +77,7 @@ while time.time() < end_time:
     pause_duration = random.uniform(min_pause_duration, max_pause_duration)
     time.sleep(pause_duration)
 
-for light in living_room_lights:
+for light in room_lights:
     state = original_states.get(light.name, {})
 
     light.on = state.get('on', True)
